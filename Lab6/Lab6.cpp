@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <string>
 #include <list>
+#include <iterator>
 #include <map>
 
 
@@ -21,6 +22,8 @@
 
 using namespace std;
 
+string az = "qwertyuiopasdfhjklzxcvbnm";
+
 string s;
 string input_string;
 
@@ -35,7 +38,8 @@ void Run();
 
 
 list <string> Stack;
-
+list <string> ::iterator pos_begin, pos_end;
+map <string, string> ::iterator act;
 map <string, string> Matrix = {
 								{"TS", "="}, {"I,", "="}, {"(E", "="}, {"(E", "<"},
 								{"(I", "="}, {"(I", "<"}, {"~M", "="}, {"&M", "="},
@@ -56,15 +60,20 @@ map <string, string> Matrix = {
 								{")&", ">"}, {"I&", ">"}, {"C&", ">"}
 };
 
-inline void Get(void)
+void Get(void)
 {
+	if (input_string[0] == ' ')
+		input_string.erase(0, 1);
+
 	s = input_string[0];
 	input_string.erase(0, 1);
 
-	while (s >= "a" && s <= "z")
+	while (s >= "a" && s <= "z" && input_string[0] != ',')
 	{
-		s += input_string[0];
+		s = s + input_string[0];
 		input_string.erase(0, 1);
+		if (az.find(input_string[0]) == std::string::npos)
+			break;
 	}
 
 	if (s.length() > 1)
@@ -84,21 +93,33 @@ void Error(const char* msg)
 void Run()
 {
 	Get();
-		if (Matrix.count(s + Stack.back()) == 0) Error("Wrong input string");
+	string cup = Stack.back() + s;
+	if (Matrix.count(cup) == 0) Error("Wrong input string");
+	
+	if (Matrix.count(cup) == 1)
+	{
+		act = Matrix.find(cup);
+		Stack.push_back(act->second);
+		Stack.push_back(s);
+	}
+
+	if (input_string.size() != 0)
+		Run();
+		
 }
 
 int main(int argc, char** argv)
 {
 
 	cout << "\n Enter a example \n >";
-	cin >> input_string;
+	getline(cin, input_string);
 
 
 
 	Get();
 		Stack.push_back(s);
 	Run();
-
+	for (auto i = Stack.begin(); i != Stack.end(); ++i) cout << *i;
 
 	system("pause");
 	return 0;
