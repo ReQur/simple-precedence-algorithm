@@ -64,10 +64,10 @@ multimap <string, string> cupMatrix =	{
 
 map <string, string> phraseMatrix = {
 									{"$=S=$", "G"},
-									{"<(=I=,=E=)>", "S"},
+									{"<(<=I=,<=E=)>", "S"},
 									{"<=E=|=T>", "E"}, {"<T>", "E"},
 									{"<T=&=M>", "T"}, {"<M>", "T"},
-									{"<~=M>", "M"}, {"<(=E=)>", "M"}, {"<C>", "M"}, {"<I>", "M"}
+									{"<~=M>", "M"}, {"<(<=E=)>", "M"}, {"<C>", "M"}, {"<I>", "M"}
 									};
 
 void Error(const string msg, const string cup)
@@ -105,6 +105,9 @@ void Analization()
 {
 	string cup = Stack.back() + s;
 
+	if (s == "")
+		return;
+
 	if (cupMatrix.count(cup) == 0) Error("Wrong input string", cup);
 
 	if (cupMatrix.count(cup) == 2)
@@ -121,7 +124,7 @@ void Analization()
 		Stack.push_back(act->second);
 		Stack.push_back(s);
 
-		/*if (act->second != ">")
+		if (act->second != ">")
 		{
 			Stack.push_back(act->second);
 			Stack.push_back(s);
@@ -134,9 +137,9 @@ void Analization()
 			string ths = s;
 			Convolution();
 			Analization();
-			s = ths;
-			Analization();
-		}*/
+			//s = ths;
+			//Analization();
+		}
 
 	}
 }
@@ -155,7 +158,58 @@ void Run()
 
 void Convolution()
 {
+	list <string> tmpStack = Stack;
 	string phrase;
+	string exphrase;
+	int state = 0;
+	string tmps;
+	bool f = true;
+
+	auto i = tmpStack.end();
+
+	while (f)
+	{
+		tmps = tmpStack.back();
+		tmpStack.pop_back();
+		phrase = tmps + phrase;
+
+		switch (state)
+		{
+		case 0:
+			if (tmps == "=")
+				state = 1;
+			if (tmps == "<")
+				state = 2;
+			break;
+
+		case 1:
+			state = 0;
+			break;
+
+		case 2:
+			f = false;
+			break;
+
+		default:
+			break;
+		}
+	}
+		if (phraseMatrix.count(phrase) != 0)
+		{
+			phrs = phraseMatrix.find(phrase);
+			s = phrs->second;
+		}
+		else
+		{
+			while (phrase[0] != '<')
+				phrase.erase(0, 1);
+			phrs = phraseMatrix.find(phrase);
+			s = phrs->second;
+		}
+
+
+
+	/*string phrase;
 
 	for (auto i = Stack.end(); *i != "<"; --i)
 	{
@@ -174,8 +228,7 @@ void Convolution()
 	cout << phrase << endl;
 
 	phrs = phraseMatrix.find(phrase);
-	s = phrs->second;
-
+	s = phrs->second;*/
 
 	/*if (phrase[0] == '=')
 	{
@@ -226,9 +279,6 @@ void Convolution()
 		phrs = phraseMatrix.find(phrase);
 		s = phrs->second;
 	}*/
-
-	
-
 }
 
 int main(int argc, char** argv)
