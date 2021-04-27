@@ -98,12 +98,20 @@ void Run()
 {
 	Get();
 	string cup = Stack.back() + s;
+
 	if (Matrix.count(cup) == 0) Error("Wrong input string", cup);
 	
 	if (Matrix.count(cup) == 1)
 	{
 		act = Matrix.find(cup);
 		Stack.push_back(act->second);
+		Stack.push_back(s);
+	}
+
+	if (Matrix.count(cup) == 2)
+	{
+		Stack.push_back("<");
+		Stack.push_back("=");
 		Stack.push_back(s);
 	}
 
@@ -124,6 +132,8 @@ int main(int argc, char** argv)
 		Stack.push_back(s);
 	Run();
 	for (auto i = Stack.begin(); i != Stack.end(); ++i) cout << *i;
+
+	cout << endl;
 
 	system("pause");
 	return 0;
