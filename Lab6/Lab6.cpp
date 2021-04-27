@@ -8,7 +8,7 @@
 
 
 /*
-   S' -> TST
+   S' -> $S$
    S -> (I, E)
    E -> "E | T"  |  T
    T -> T & M  |  M
@@ -24,7 +24,7 @@
 
 using namespace std;
 
-string az = "qwertyuiopasdfhjklzxcvbnm";
+string az = "qwertyuiopasdfghjklzxcvbnm";
 
 string s;
 string input_string;
@@ -41,14 +41,14 @@ void Convolution();
 
 list <string> Stack;
 list <string> ::iterator pos_begin, pos_end;
-map <string, string> ::iterator act;
-map <string, string> cupMatrix =	{
-								{"TS", "="}, {"I,", "="}, {"(E", "="}, {"(E", "<"},
-								{"(I", "="}, {"(I", "<"}, {"~M", "="}, {"&M", "="},
-								{"|T", "="}, {",E", "="}, {",E", "<"}, {"T&", "="},
-								{"E|", "="}, {"E)", "="}, {"ST", "="},
+map <string, string> ::iterator act, phrs;
+multimap <string, string> cupMatrix =	{
+								{"$S", "="}, {"I,", "="}, {"(E", "="}, {"(E", "<"},
+								{"(I", "="}, {"&M", "="}, {"~M", "="}, {"(I", "<"},
+								{"|T", "="}, {",E", "="}, {"T&", "="}, {",E", "<"},
+								{"E|", "="}, {"E)", "="}, {"S$", "="},
 
-								{"TC", "<"}, {"T(", "<"}, {"(M", "<"}, {"(~", "<"},
+								{"$(", "<"}, {"(T", "<"}, {"(M", "<"}, {"(~", "<"},
 								{"((", "<"}, {"(C", "<"}, {"~~", "<"}, {"~(", "<"},
 								{"~I", "<"}, {"~C", "<"}, {"&~", "<"}, {"&(", "<"},
 								{"&I", "<"}, {"&C", "<"}, {"|M", "<"}, {"|~", "<"},
@@ -56,19 +56,19 @@ map <string, string> cupMatrix =	{
 								{",M", "<"}, {",~", "<"}, {",(", "<"}, {",I", "<"},
 								{",C", "<"},
 
-								{")T", ">"}, {"T)", ">"}, {"M)", ">"}, {"))", ">"},
+								{")$", ">"}, {"T)", ">"}, {"M)", ">"}, {"))", ">"},
 								{"I)", ">"}, {"C)", ">"}, {"T|", ">"}, {"M|", ">"},
 								{")|", ">"}, {"C|", ">"}, {"I|", ">"}, {"M&", ">"},
 								{")&", ">"}, {"I&", ">"}, {"C&", ">"}
 								};
 
 map <string, string> phraseMatrix = {
-									{"T=S=T", "G"},
-									{"<(=I=,=E=)>", "S"},
-									{"<E=|=T>", "E"}, {"<T>", "E"},
+									{"$=S=$", "G"},
+									{"<(<=I=,<=E=)>", "S"},
+									{"<=E=|=T>", "E"}, {"<T>", "E"},
 									{"<T=&=M>", "T"}, {"<M>", "T"},
-									{"<~=M>", "M"}, {"<(=E=)>", "M"}, {"<C>", "M"},
-};
+									{"<~=M>", "M"}, {"<(<=E=)>", "M"}, {"<C>", "M"}, {"<I>", "M"}
+									};
 
 void Error(const string msg, const string cup)
 {
@@ -101,15 +101,19 @@ void Get(void)
 	
 }
 
-
-
-void Run()
+void Analization()
 {
-	Get();
 	string cup = Stack.back() + s;
 
 	if (cupMatrix.count(cup) == 0) Error("Wrong input string", cup);
-	
+
+	if (cupMatrix.count(cup) == 2)
+	{
+		Stack.push_back("<");
+		Stack.push_back("=");
+		Stack.push_back(s);
+	}
+	else 
 	if (cupMatrix.count(cup) == 1)
 	{
 		act = cupMatrix.find(cup);
@@ -120,24 +124,25 @@ void Run()
 		}
 		else
 		{
+
 			Stack.push_back(act->second);
-			Convolution();
 
 			string ths = s;
-
-			//Run();
-
-			Stack.push_back(ths);
+			Convolution();
+			Analization();
+			s = ths;
+			Analization();
 		}
-		
-	}
 
-	if (cupMatrix.count(cup) == 2)
-	{
-		Stack.push_back("<");
-		Stack.push_back("=");
-		Stack.push_back(s);
 	}
+}
+
+void Run()
+{
+	Get();
+
+	Analization();
+
 
 	if (input_string.size() != 0)
 		Run();
@@ -146,16 +151,70 @@ void Run()
 
 void Convolution()
 {
-	auto i = Stack.end();
 	string phrase;
 
-	for (i; *i != "<" ; --i)
-		phrase = *i + phrase;
+	for (auto i = Stack.end(); *i != "<"; --i)
+	{
+		phrase = Stack.back() + phrase;
+		Stack.pop_back();
+
+	}
+	Stack.pop_back();
 	phrase = "<" + phrase;
+
+	cout << phrase << endl;
+
+	if (phrase[0] == '=')
+	{
+		Stack.pop_back();
+		phrase = "<" + phrase;
+
+		cout << phrase << endl;
+
+
+		list <string> tmpStack = Stack;
+		string extphrase = phrase;
+		for (auto i = tmpStack.end(); *i != "<" and *i != "$"; --i)
+		{
+			extphrase = tmpStack.back() + extphrase;
+			tmpStack.pop_back();
+		}
+		
+		if (tmpStack.back() == "<")
+		{
+			extphrase = tmpStack.back() + extphrase;
+			tmpStack.pop_back();
+			if (phraseMatrix.count(extphrase) != 0)
+			{
+				phrs = phraseMatrix.find(extphrase);
+				s = phrs->second;
+			}
+			else
+			{
+				phrs = phraseMatrix.find(phrase);
+				s = phrs->second;
+			}
+		}
+		else
+		{
+			phrs = phraseMatrix.find(phrase);
+			s = phrs->second;
+		}
+
+	}
+	else
+	{
+		Stack.pop_back();
+		phrase = "<" + phrase;
+
+		cout << phrase << endl;
+
+
+		phrs = phraseMatrix.find(phrase);
+		s = phrs->second;
+	}
+
 	
-
-
-
 
 }
 
