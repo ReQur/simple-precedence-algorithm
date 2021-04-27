@@ -64,10 +64,10 @@ multimap <string, string> cupMatrix =	{
 
 map <string, string> phraseMatrix = {
 									{"$=S=$", "G"},
-									{"<(<=I=,<=E=)>", "S"},
+									{"<(=I=,=E=)>", "S"},
 									{"<=E=|=T>", "E"}, {"<T>", "E"},
 									{"<T=&=M>", "T"}, {"<M>", "T"},
-									{"<~=M>", "M"}, {"<(<=E=)>", "M"}, {"<C>", "M"}, {"<I>", "M"}
+									{"<~=M>", "M"}, {"<(=E=)>", "M"}, {"<C>", "M"}, {"<I>", "M"}
 									};
 
 void Error(const string msg, const string cup)
@@ -117,7 +117,11 @@ void Analization()
 	if (cupMatrix.count(cup) == 1)
 	{
 		act = cupMatrix.find(cup);
-		if (act->second != ">")
+
+		Stack.push_back(act->second);
+		Stack.push_back(s);
+
+		/*if (act->second != ">")
 		{
 			Stack.push_back(act->second);
 			Stack.push_back(s);
@@ -132,7 +136,7 @@ void Analization()
 			Analization();
 			s = ths;
 			Analization();
-		}
+		}*/
 
 	}
 }
@@ -164,7 +168,16 @@ void Convolution()
 
 	cout << phrase << endl;
 
-	if (phrase[0] == '=')
+	Stack.pop_back();
+	phrase = "<" + phrase;
+
+	cout << phrase << endl;
+
+	phrs = phraseMatrix.find(phrase);
+	s = phrs->second;
+
+
+	/*if (phrase[0] == '=')
 	{
 		Stack.pop_back();
 		phrase = "<" + phrase;
@@ -212,7 +225,7 @@ void Convolution()
 
 		phrs = phraseMatrix.find(phrase);
 		s = phrs->second;
-	}
+	}*/
 
 	
 
