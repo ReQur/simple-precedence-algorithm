@@ -17,6 +17,8 @@
 
    C = {true, false}
    I = {a, b, c, ..., z}
+
+   example: (b, true|a&(false|~true))
 */
 
 
@@ -28,7 +30,7 @@ string s;
 string input_string;
 
 inline void Get(void);
-void Error(const char* msg, const char* param);
+void Error(const string msg, const string param);
 
 
 void Run();
@@ -59,6 +61,14 @@ map <string, string> Matrix = {
 								{")|", ">"}, {"C|", ">"}, {"I|", ">"}, {"M&", ">"},
 								{")&", ">"}, {"I&", ">"}, {"C&", ">"}
 };
+void Error(const string msg, const string cup)
+{
+	string Errmes = "Error: " + msg + ", " + "\"" + cup + "\"" + " is unkown couple of elements";
+	cout << Errmes << endl;
+	system("pause");
+	exit(7);
+}
+
 
 void Get(void)
 {
@@ -68,7 +78,7 @@ void Get(void)
 	s = input_string[0];
 	input_string.erase(0, 1);
 
-	while (s >= "a" && s <= "z" && input_string[0] != ',')
+	while (s >= "a" && s <= "z" && az.find(input_string[0]) != std::string::npos)
 	{
 		s = s + input_string[0];
 		input_string.erase(0, 1);
@@ -76,25 +86,19 @@ void Get(void)
 			break;
 	}
 
-	if (s.length() > 1)
+	if (az.find(s[0]) != std::string::npos)
 		if (s == "true" or s == "false") s = "C";
 		else s = "I";
 	
 }
 
-void Error(const char* msg)
-{
-	cout << "Error: " << msg << endl;
-	system("pause");
-	exit(7);
-}
 
 
 void Run()
 {
 	Get();
 	string cup = Stack.back() + s;
-	if (Matrix.count(cup) == 0) Error("Wrong input string");
+	if (Matrix.count(cup) == 0) Error("Wrong input string", cup);
 	
 	if (Matrix.count(cup) == 1)
 	{
