@@ -34,7 +34,7 @@ void Error(const string msg, const string param);
 
 
 void Run();
-
+void Convolution();
 
 
 
@@ -42,7 +42,7 @@ void Run();
 list <string> Stack;
 list <string> ::iterator pos_begin, pos_end;
 map <string, string> ::iterator act;
-map <string, string> Matrix = {
+map <string, string> cupMatrix =	{
 								{"TS", "="}, {"I,", "="}, {"(E", "="}, {"(E", "<"},
 								{"(I", "="}, {"(I", "<"}, {"~M", "="}, {"&M", "="},
 								{"|T", "="}, {",E", "="}, {",E", "<"}, {"T&", "="},
@@ -60,7 +60,16 @@ map <string, string> Matrix = {
 								{"I)", ">"}, {"C)", ">"}, {"T|", ">"}, {"M|", ">"},
 								{")|", ">"}, {"C|", ">"}, {"I|", ">"}, {"M&", ">"},
 								{")&", ">"}, {"I&", ">"}, {"C&", ">"}
+								};
+
+map <string, string> phraseMatrix = {
+									{"T=S=T", "G"},
+									{"<(=I=,=E=)>", "S"},
+									{"<E=|=T>", "E"}, {"<T>", "E"},
+									{"<T=&=M>", "T"}, {"<M>", "T"},
+									{"<~=M>", "M"}, {"<(=E=)>", "M"}, {"<C>", "M"},
 };
+
 void Error(const string msg, const string cup)
 {
 	string Errmes = "Error: " + msg + ", " + "\"" + cup + "\"" + " is unkown couple of elements";
@@ -99,16 +108,31 @@ void Run()
 	Get();
 	string cup = Stack.back() + s;
 
-	if (Matrix.count(cup) == 0) Error("Wrong input string", cup);
+	if (cupMatrix.count(cup) == 0) Error("Wrong input string", cup);
 	
-	if (Matrix.count(cup) == 1)
+	if (cupMatrix.count(cup) == 1)
 	{
-		act = Matrix.find(cup);
-		Stack.push_back(act->second);
-		Stack.push_back(s);
+		act = cupMatrix.find(cup);
+		if (act->second != ">")
+		{
+			Stack.push_back(act->second);
+			Stack.push_back(s);
+		}
+		else
+		{
+			Stack.push_back(act->second);
+			Convolution();
+
+			string ths = s;
+
+			//Run();
+
+			Stack.push_back(ths);
+		}
+		
 	}
 
-	if (Matrix.count(cup) == 2)
+	if (cupMatrix.count(cup) == 2)
 	{
 		Stack.push_back("<");
 		Stack.push_back("=");
@@ -118,6 +142,21 @@ void Run()
 	if (input_string.size() != 0)
 		Run();
 		
+}
+
+void Convolution()
+{
+	auto i = Stack.end();
+	string phrase;
+
+	for (i; *i != "<" ; --i)
+		phrase = *i + phrase;
+	phrase = "<" + phrase;
+	
+
+
+
+
 }
 
 int main(int argc, char** argv)
@@ -131,8 +170,8 @@ int main(int argc, char** argv)
 	Get();
 		Stack.push_back(s);
 	Run();
-	for (auto i = Stack.begin(); i != Stack.end(); ++i) cout << *i;
 
+	for (auto i = Stack.begin(); i != Stack.end(); ++i) cout << *i;
 	cout << endl;
 
 	system("pause");
