@@ -43,24 +43,24 @@ list <string> Stack;
 list <string> ::iterator pos_begin, pos_end;
 map <string, string> ::iterator act, phrs;
 multimap <string, string> cupMatrix =	{
-								{"$S", "="}, {"I,", "="}, {"(E", "="}, {"(E", "<"},
-								{"(I", "="}, {"&M", "="}, {"~M", "="}, {"(I", "<"},
-								{"|T", "="}, {",E", "="}, {"T&", "="}, {",E", "<"},
-								{"E|", "="}, {"E)", "="}, {"S$", "="},
+										{"$S", "="}, {"I,", "="}, {"(E", "="}, {"(E", "<"},
+										{"(I", "="}, {"&M", "="}, {"~M", "="}, {"(I", "<"},
+										{"|T", "="}, {",E", "="}, {"T&", "="}, {",E", "<"},
+										{"E|", "="}, {"E)", "="}, {"S$", "="},
 
-								{"$(", "<"}, {"(T", "<"}, {"(M", "<"}, {"(~", "<"},
-								{"((", "<"}, {"(C", "<"}, {"~~", "<"}, {"~(", "<"},
-								{"~I", "<"}, {"~C", "<"}, {"&~", "<"}, {"&(", "<"},
-								{"&I", "<"}, {"&C", "<"}, {"|M", "<"}, {"|~", "<"},
-								{"|(", "<"}, {"|I", "<"}, {"|C", "<"}, {",T", "<"},
-								{",M", "<"}, {",~", "<"}, {",(", "<"}, {",I", "<"},
-								{",C", "<"},
+										{"$(", "<"}, {"(T", "<"}, {"(M", "<"}, {"(~", "<"},
+										{"((", "<"}, {"(C", "<"}, {"~~", "<"}, {"~(", "<"},
+										{"~I", "<"}, {"~C", "<"}, {"&~", "<"}, {"&(", "<"},
+										{"&I", "<"}, {"&C", "<"}, {"|M", "<"}, {"|~", "<"},
+										{"|(", "<"}, {"|I", "<"}, {"|C", "<"}, {",T", "<"},
+										{",M", "<"}, {",~", "<"}, {",(", "<"}, {",I", "<"},
+										{",C", "<"},
 
-								{")$", ">"}, {"T)", ">"}, {"M)", ">"}, {"))", ">"},
-								{"I)", ">"}, {"C)", ">"}, {"T|", ">"}, {"M|", ">"},
-								{")|", ">"}, {"C|", ">"}, {"I|", ">"}, {"M&", ">"},
-								{")&", ">"}, {"I&", ">"}, {"C&", ">"}
-								};
+										{")$", ">"}, {"T)", ">"}, {"M)", ">"}, {"))", ">"},
+										{"I)", ">"}, {"C)", ">"}, {"T|", ">"}, {"M|", ">"},
+										{")|", ">"}, {"C|", ">"}, {"I|", ">"}, {"M&", ">"},
+										{")&", ">"}, {"I&", ">"}, {"C&", ">"}
+										};
 
 map <string, string> phraseMatrix = {
 									{"$=S=$", "G"},
@@ -121,8 +121,8 @@ void Analization()
 	{
 		act = cupMatrix.find(cup);
 
-		Stack.push_back(act->second);
-		Stack.push_back(s);
+		/*Stack.push_back(act->second);
+		Stack.push_back(s);*/
 
 		if (act->second != ">")
 		{
@@ -137,8 +137,8 @@ void Analization()
 			string ths = s;
 			Convolution();
 			Analization();
-			//s = ths;
-			//Analization();
+			s = ths;
+			Analization();
 		}
 
 	}
@@ -167,13 +167,13 @@ void Convolution()
 
 	auto i = tmpStack.end();
 
-	while (f)
+	while (f) // need to add exiting by terminator
 	{
 		tmps = tmpStack.back();
 		tmpStack.pop_back();
 		phrase = tmps + phrase;
 
-		switch (state)
+		switch (state) 
 		{
 		case 0:
 			if (tmps == "=")
@@ -194,19 +194,21 @@ void Convolution()
 			break;
 		}
 	}
-		if (phraseMatrix.count(phrase) != 0)
-		{
-			phrs = phraseMatrix.find(phrase);
-			s = phrs->second;
-		}
-		else
-		{
-			while (phrase[0] != '<')
-				phrase.erase(0, 1);
-			phrs = phraseMatrix.find(phrase);
-			s = phrs->second;
-		}
+	if (phraseMatrix.count(phrase) != 0) // need to be cycled while stack is ran out or phrase will shorted
+	{
+		phrs = phraseMatrix.find(phrase);
+		s = phrs->second;
+	}
+	else
+	{
+		while (phrase[0] != '<')
+			phrase.erase(0, 1);
+		phrs = phraseMatrix.find(phrase);
+		s = phrs->second;
+	}
 
+
+	Stack.resize(Stack.size() - phrase.size());
 
 
 	/*string phrase;
