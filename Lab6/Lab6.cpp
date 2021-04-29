@@ -46,7 +46,7 @@ multimap <string, string> cupMatrix =	{
 										{"$S", "="}, {"I,", "="}, {"(E", "="}, {"(E", "<"},
 										{"(I", "="}, {"&M", "="}, {"~M", "="}, {"(I", "<"},
 										{"|T", "="}, {",E", "="}, {"T&", "="}, {",E", "<"},
-										{"E|", "="}, {"E)", "="}, {"S$", "="},
+										{"E|", "="}, {"E)", "="}, {"S$", "="}, {"|T", "<"},
 
 										{"$(", "<"}, {"(T", "<"}, {"(M", "<"}, {"(~", "<"},
 										{"((", "<"}, {"(C", "<"}, {"~~", "<"}, {"~(", "<"},
@@ -65,12 +65,12 @@ multimap <string, string> cupMatrix =	{
 map <string, string> phraseMatrix = {
 									{"$=S=$", "G"},
 									{"<(<=I=,<=E=)>", "S"},
-									{"<=E=|=T>", "E"}, {"<T>", "E"},
-									{"<T=&=M>", "T"}, {"<M>", "T"},
+									{"<=E=|<=T>", "E"}, {"<=T>", "E"},{"<T>", "E"},
+									{"<=T=&=M>", "T"}, {"<T=&=M>", "T"},{"<M>", "T"},
 									{"<~=M>", "M"}, {"<(<=E=)>", "M"}, {"<C>", "M"}, {"<I>", "M"}
 									};
 
-void Error(const string msg, const string cup)
+void Error(const string msg, const string cup = "")
 {
 	string Errmes = "Error: " + msg + ", " + "\"" + cup + "\"" + " is unkown couple of elements";
 	cout << Errmes << endl;
@@ -172,7 +172,6 @@ void Convolution()
 		tmps = tmpStack.back();
 		tmpStack.pop_back();
 		phrase = tmps + phrase;
-
 		switch (state) 
 		{
 		case 0:
@@ -180,10 +179,14 @@ void Convolution()
 				state = 1;
 			if (tmps == "<")
 				state = 2;
+			if (tmps == "$")
+				state = 2;
 			break;
 
 		case 1:
 			state = 0;
+			if (tmps == "$")
+				state = 2;
 			break;
 
 		case 2:
@@ -194,93 +197,27 @@ void Convolution()
 			break;
 		}
 	}
-	if (phraseMatrix.count(phrase) != 0) // need to be cycled while stack is ran out or phrase will shorted
+	tmpStack.push_back(tmps);
+	while (phraseMatrix.count(phrase) == 0 && phrase.size() != 0) // need to be cycled while stack is ran out or phrase will shorted
 	{
-		phrs = phraseMatrix.find(phrase);
-		s = phrs->second;
-	}
-	else
-	{
-		while (phrase[0] != '<')
+		while (true)
+		{
 			phrase.erase(0, 1);
-		phrs = phraseMatrix.find(phrase);
-		s = phrs->second;
+			if (phrase[0] == '<')
+				break;
+		}
+			
 	}
+
+	if (phrase.empty())
+		Error("Wrong lexeme");
+
+	phrs = phraseMatrix.find(phrase);
+	s = phrs->second;
 
 
 	Stack.resize(Stack.size() - phrase.size());
 
-
-	/*string phrase;
-
-	for (auto i = Stack.end(); *i != "<"; --i)
-	{
-		phrase = Stack.back() + phrase;
-		Stack.pop_back();
-
-	}
-	Stack.pop_back();
-	phrase = "<" + phrase;
-
-	cout << phrase << endl;
-
-	Stack.pop_back();
-	phrase = "<" + phrase;
-
-	cout << phrase << endl;
-
-	phrs = phraseMatrix.find(phrase);
-	s = phrs->second;*/
-
-	/*if (phrase[0] == '=')
-	{
-		Stack.pop_back();
-		phrase = "<" + phrase;
-
-		cout << phrase << endl;
-
-
-		list <string> tmpStack = Stack;
-		string extphrase = phrase;
-		for (auto i = tmpStack.end(); *i != "<" and *i != "$"; --i)
-		{
-			extphrase = tmpStack.back() + extphrase;
-			tmpStack.pop_back();
-		}
-		
-		if (tmpStack.back() == "<")
-		{
-			extphrase = tmpStack.back() + extphrase;
-			tmpStack.pop_back();
-			if (phraseMatrix.count(extphrase) != 0)
-			{
-				phrs = phraseMatrix.find(extphrase);
-				s = phrs->second;
-			}
-			else
-			{
-				phrs = phraseMatrix.find(phrase);
-				s = phrs->second;
-			}
-		}
-		else
-		{
-			phrs = phraseMatrix.find(phrase);
-			s = phrs->second;
-		}
-
-	}
-	else
-	{
-		Stack.pop_back();
-		phrase = "<" + phrase;
-
-		cout << phrase << endl;
-
-
-		phrs = phraseMatrix.find(phrase);
-		s = phrs->second;
-	}*/
 }
 
 int main(int argc, char** argv)
