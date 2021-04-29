@@ -7,6 +7,7 @@
 #include <map>
 
 
+
 /*
    S' -> $S$
    S -> (I, E)
@@ -70,9 +71,9 @@ map <string, string> phraseMatrix = {
 									{"<~=M>", "M"}, {"<(<=E=)>", "M"}, {"<C>", "M"}, {"<I>", "M"}
 									};
 
-void Error(const string msg, const string cup = "")
+void Error(const string msg, const string smsg = "")
 {
-	string Errmes = "Error: " + msg + ", " + "\"" + cup + "\"" + " is unkown couple of elements";
+	string Errmes = "Error: " + msg + ", " + smsg;
 	cout << Errmes << endl;
 	system("pause");
 	exit(7);
@@ -108,7 +109,7 @@ void Analization()
 	if (s == "")
 		return;
 
-	if (cupMatrix.count(cup) == 0) Error("Wrong input string", cup);
+	if (cupMatrix.count(cup) == 0) Error("Wrong input string", "\"" + cup + "\"" + " is unkown couple of elements");
 
 	if (cupMatrix.count(cup) == 2)
 	{
@@ -120,9 +121,6 @@ void Analization()
 	if (cupMatrix.count(cup) == 1)
 	{
 		act = cupMatrix.find(cup);
-
-		/*Stack.push_back(act->second);
-		Stack.push_back(s);*/
 
 		if (act->second != ">")
 		{
@@ -167,7 +165,7 @@ void Convolution()
 
 	auto i = tmpStack.end();
 
-	while (f) // need to add exiting by terminator
+	while (f)
 	{
 		tmps = tmpStack.back();
 		tmpStack.pop_back();
@@ -198,7 +196,7 @@ void Convolution()
 		}
 	}
 	tmpStack.push_back(tmps);
-	while (phraseMatrix.count(phrase) == 0 && phrase.size() != 0) // need to be cycled while stack is ran out or phrase will shorted
+	while (phraseMatrix.count(phrase) == 0 && phrase.size() != 0)
 	{
 		while (true)
 		{
@@ -223,18 +221,37 @@ void Convolution()
 int main(int argc, char** argv)
 {
 
-	cout << "\n Enter a example \n >";
-	getline(cin, input_string);
+
+	ifstream fin("in.txt", ios_base::in);
+
+	if (fin.is_open() == 0)
+		Error("File was not open");
 
 
 
-	Get();
+	while (!fin.eof())
+	{
+		getline(fin, input_string);
+		cout << input_string << " >> ";
+		input_string.insert(input_string.begin(), '$');
+		input_string.push_back('$');
+		Get();
 		Stack.push_back(s);
-	Run();
+		Run();
+		string result;
+		for (auto i = Stack.begin(); i != Stack.end(); ++i) result = result + *i;
+		if (result == "$=S=$")
+			cout << "Accepted!" << endl;
+		else
+			cout << "Wrond lexem" << endl;
+		Stack.clear();
+		input_string.clear();
+	}
 
-	for (auto i = Stack.begin(); i != Stack.end(); ++i) cout << *i;
-	cout << endl;
+	
+	cout << "Done!" << endl;
 
+	fin.close();
 	system("pause");
 	return 0;
 }

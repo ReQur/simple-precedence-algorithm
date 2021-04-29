@@ -1,0 +1,8 @@
+(first, true)
+(secnd, y|z)
+(thrd, y&y)
+(a, t|t|t|t)
+(b, t&t&t&t&t)
+(g, ~g)
+(s, true&(false|true))
+(b, true|a&(false|~true))
